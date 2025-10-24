@@ -29,5 +29,9 @@ public class ProductService {
     public Product getProductByName(String name) {
         return productRepository.findByName(name);
     }
-}
 
+    // New method to get products by category ID
+    public List<Product> getProductsByCategory(Long categoryId) {
+        return productRepository.findByCategory_Id(categoryId);
+    }
+}

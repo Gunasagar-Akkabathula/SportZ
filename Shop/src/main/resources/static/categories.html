@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Category Dropdown</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 32px; }
+        label { font-weight: bold; }
+        select { padding: 8px; margin-left: 8px; }
+    </style>
+</head>
+<body>
+    <h2>Select a Category</h2>
+    <label for="categorySelect">Category:</label>
+    <select id="categorySelect">
+        <option value="">-- Choose Category --</option>
+    </select>
+
+    <script>
+        // Fetch category data from backend API and populate dropdown
+        fetch('/api/categories')
+            .then(response => response.json())
+            .then(categories => {
+                const dropdown = document.getElementById('categorySelect');
+                categories.forEach(cat => {
+                    const option = document.createElement('option');
+                    option.value = cat.id;
+                    option.textContent = cat.categoryName;
+                    dropdown.appendChild(option);
+                });
+            })
+            .catch(error => {
+                alert('Failed to load categories: ' + error);
+            });
+    </script>
+</body>
+</html>
