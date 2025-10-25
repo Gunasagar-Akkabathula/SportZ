@@ -16,14 +16,12 @@ public class Product {
     @Column(name = "image_url")
     private String imageUrl;
 
-    // Add this block to link Product to a Category
     @ManyToOne
-    @JoinColumn(name = "category_id") // matches your SQL column name
+    @JoinColumn(name = "category_id")
     private Category category;
 
     public Product() {}
 
-    // Include Category in your constructor as needed
     public Product(String name, String description, Double price, String imageUrl, Category category) {
         this.name = name;
         this.description = description;

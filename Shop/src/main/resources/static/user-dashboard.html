@@ -15,7 +15,6 @@
     .badge.bg-danger#cart-count { font-size: 0.95rem; margin-left: 4px; font-weight: 700; padding: 3px 9px; vertical-align: middle; position: relative; top: 0; }
     .product-card img { max-height: 200px; object-fit: contain; }
     .product-price { color: #b12704; font-weight: bold; font-size: 1.1rem; }
-    /* Navbar dropdown alignment fix for smaller screens */
     #category-navbar-form { min-width: 200px; margin-left: 15px; }
     #categoryNavbarSelect { min-width: 130px;}
   </style>
@@ -31,8 +30,8 @@
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
-        <form class="d-flex mx-auto w-50" role="search">
-          <input class="form-control me-2 search-input" type="search" placeholder="Search for products, brands and more" aria-label="Search" />
+        <form class="d-flex mx-auto w-50" role="search" id="search-form">
+          <input class="form-control me-2 search-input" type="search" placeholder="Search for products, brands and more" aria-label="Search" id="search-input" />
           <button class="btn btn-warning" type="submit">Search</button>
         </form>
         <form class="d-flex align-items-center ms-3" id="category-navbar-form">
@@ -146,14 +145,27 @@
       }
     }
 
-    async function loadProducts(categoryId) {
+    async function loadProducts(categoryId = '', searchQuery = '') {
       let url = '/products';
-      if (categoryId) url += `?categoryId=${categoryId}`;
+      
+      // Priority: search query overrides category filter
+      if (searchQuery && searchQuery.trim() !== '') {
+        url = `/products/search?query=${encodeURIComponent(searchQuery.trim())}`;
+      } else if (categoryId) {
+        url += `?categoryId=${categoryId}`;
+      }
+      
       const res = await fetch(url);
       if (res.ok) {
         const products = await res.json();
         const grid = document.getElementById('products-grid');
         grid.innerHTML = '';
+        
+        if (products.length === 0) {
+          grid.innerHTML = '<div class="col-12"><p class="text-center text-muted">No products found.</p></div>';
+          return;
+        }
+        
         products.forEach(product => {
           const col = document.createElement('div');
           col.className = "col-sm-6 col-md-4 col-lg-3";
@@ -170,7 +182,8 @@
           `;
           grid.appendChild(col);
         });
-        // AddToCart logic...
+        
+        // AddToCart logic
         document.querySelectorAll('.btn-warning.mt-auto').forEach(button => {
           button.addEventListener('click', async function(e) {
             e.preventDefault();
@@ -201,10 +214,44 @@
       renderNavbar();
       updateCartBadgeFromApi();
       loadProducts();
+      
+      // Category dropdown change event
       const select = document.getElementById('categoryNavbarSelect');
       if (select) {
         select.addEventListener('change', function () {
+          const searchInput = document.getElementById('search-input');
+          if (searchInput) searchInput.value = ''; // Clear search when category changes
           loadProducts(this.value);
+        });
+      }
+      
+      // Search form submission
+      const searchForm = document.getElementById('search-form');
+      const searchInput = document.getElementById('search-input');
+      
+      if (searchForm) {
+        searchForm.addEventListener('submit', function(e) {
+          e.preventDefault();
+          const query = searchInput.value;
+          const categorySelect = document.getElementById('categoryNavbarSelect');
+          if (categorySelect) categorySelect.value = ''; // Clear category when searching
+          loadProducts('', query);
+        });
+      }
+      
+      // Optional: Real-time search as user types
+      if (searchInput) {
+        let searchTimeout;
+        searchInput.addEventListener('input', function() {
+          clearTimeout(searchTimeout);
+          searchTimeout = setTimeout(() => {
+            const query = this.value;
+            if (query.length >= 1 || query.length === 0) {
+              const categorySelect = document.getElementById('categoryNavbarSelect');
+              if (categorySelect && query.length > 0) categorySelect.value = '';
+              loadProducts('', query);
+            }
+          }, 300);
         });
       }
     });

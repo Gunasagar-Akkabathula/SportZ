@@ -35,15 +35,14 @@
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
-        <form class="d-flex mx-auto w-50" role="search">
-          <input class="form-control me-2 search-input" type="search" placeholder="Search products, brands and more" aria-label="Search" />
+        <form class="d-flex mx-auto w-50" role="search" id="search-form">
+          <input class="form-control me-2 search-input" type="search" placeholder="Search products, brands and more" aria-label="Search" id="search-input" />
           <button class="btn btn-warning" type="submit">Search</button>
         </form>
         <ul class="navbar-nav ms-auto align-items-center" id="dynamic-navbar-links"></ul>
       </div>
     </div>
   </nav>
-
 
   <div class="container">
     <h2 class="mt-4 mb-2">Admin Dashboard</h2>
@@ -143,6 +142,7 @@
         `;
       }
     }
+    
     function logout() {
       localStorage.clear();
       window.location.href = "index.html";
@@ -194,13 +194,25 @@
         }
     });
 
-    // Load Products
-    async function loadProducts() {
+    // Load Products with optional search
+    async function loadProducts(searchQuery = '') {
       const grid = document.getElementById("products-grid");
-      const res = await fetch('/products');
+      let url = '/products';
+      
+      if (searchQuery && searchQuery.trim() !== '') {
+        url = `/products/search?query=${encodeURIComponent(searchQuery.trim())}`;
+      }
+      
+      const res = await fetch(url);
       if (res.ok) {
         const products = await res.json();
         grid.innerHTML = '';
+        
+        if (products.length === 0) {
+          grid.innerHTML = '<p class="text-center text-muted">No products found.</p>';
+          return;
+        }
+        
         products.forEach(product => {
           grid.innerHTML += `
             <div class="product-card row align-items-center">
@@ -234,16 +246,20 @@
       document.getElementById("edit-product-desc").value = unescapeQuotes(desc);
       document.getElementById("edit-product-price").value = price;
       document.getElementById("edit-product-image").value = unescapeQuotes(imageUrl);
+      
       // Load categories for edit dropdown and select current
       loadCategoriesToDropdown('edit-product-category').then(() => {
         document.getElementById('edit-product-category').value = window.currentEditingCategoryId;
       });
+      
       const editModal = new bootstrap.Modal(document.getElementById('editProductModal'));
-      // Store current category id globally (set this when opening modal)
+      
+      // Store current category id globally
       fetch(`/products/${id}`).then(res => res.json()).then(prod => {
         window.currentEditingCategoryId = prod.category ? prod.category.id : "";
         document.getElementById('edit-product-category').value = window.currentEditingCategoryId;
       });
+      
       editModal.show();
     };
 
@@ -298,6 +314,32 @@
       renderNavbar();
       loadProducts();
       loadCategoriesToDropdown('product-category');
+      
+      // Search form submission
+      const searchForm = document.getElementById('search-form');
+      const searchInput = document.getElementById('search-input');
+      
+      if (searchForm) {
+        searchForm.addEventListener('submit', function(e) {
+          e.preventDefault();
+          const query = searchInput.value;
+          loadProducts(query);
+        });
+      }
+      
+      // Optional: Real-time search
+      if (searchInput) {
+        let searchTimeout;
+        searchInput.addEventListener('input', function() {
+          clearTimeout(searchTimeout);
+          searchTimeout = setTimeout(() => {
+            const query = this.value;
+            if (query.length >= 1 || query.length === 0) {
+              loadProducts(query);
+            }
+          }, 300);
+        });
+      }
     };
   </script>
 </body>

@@ -30,8 +30,12 @@ public class ProductService {
         return productRepository.findByName(name);
     }
 
-    // New method to get products by category ID
     public List<Product> getProductsByCategory(Long categoryId) {
         return productRepository.findByCategory_Id(categoryId);
+    }
+
+    // Search products by query
+    public List<Product> searchProducts(String query) {
+        return productRepository.findByNameContainingIgnoreCase(query);
     }
 }

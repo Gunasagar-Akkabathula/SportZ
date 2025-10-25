@@ -35,6 +35,24 @@ public class ProductController {
         return ResponseEntity.ok(productService.getAllProducts());
     }
 
+    // Search endpoint
+    @GetMapping("/search")
+    public ResponseEntity<List<Product>> searchProducts(@RequestParam String query) {
+        if (query == null || query.trim().isEmpty()) {
+            return ResponseEntity.ok(productService.getAllProducts());
+        }
+        return ResponseEntity.ok(productService.searchProducts(query.trim()));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Product> getProductById(@PathVariable Long id) {
+        return productService.getAllProducts().stream()
+                .filter(p -> p.getId().equals(id))
+                .findFirst()
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     @PostMapping
     public ResponseEntity<?> addProduct(@RequestParam String adminEmail, @RequestBody Product product) {
         if (!isAdmin(adminEmail)) {
