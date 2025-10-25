@@ -6,6 +6,7 @@ import java.util.Optional;
 import com.ecommerce.Shop.model.Cart;
 import com.ecommerce.Shop.model.CartRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CartService {
@@ -15,13 +16,16 @@ public class CartService {
         this.cartRepository = cartRepository;
     }
 
-    public Cart addOrUpdateCartItem(String userEmail, String itemName, int quantity) {
+    public Cart addOrUpdateCartItem(String userEmail, String itemName, int quantity, Double price, String imageUrl) {
         Cart existing = cartRepository.findByUserEmailAndItemName(userEmail, itemName);
         if (existing != null) {
             existing.setQuantity(existing.getQuantity() + quantity);
+            // Update price and image in case they changed
+            existing.setPrice(price);
+            existing.setImageUrl(imageUrl);
             return cartRepository.save(existing);
         } else {
-            Cart cart = new Cart(userEmail, itemName, quantity);
+            Cart cart = new Cart(userEmail, itemName, quantity, price, imageUrl);
             return cartRepository.save(cart);
         }
     }
@@ -40,5 +44,11 @@ public class CartService {
 
     public Cart saveCart(Cart cart) {
         return cartRepository.save(cart);
+    }
+    
+    @Transactional
+    public void clearCart(String userEmail) {
+        List<Cart> carts = cartRepository.findByUserEmail(userEmail);
+        cartRepository.deleteAll(carts);
     }
 }

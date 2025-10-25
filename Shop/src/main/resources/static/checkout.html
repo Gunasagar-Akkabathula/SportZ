@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Checkout - Shop</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+  <style>
+    .payment-method {
+      border: 2px solid #dee2e6;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 15px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .payment-method:hover {
+      border-color: #ff6600;
+      background-color: #fff5f0;
+    }
+    .payment-method.selected {
+      border-color: #ff6600;
+      background-color: #fff5f0;
+    }
+    .payment-method input[type="radio"] {
+      margin-right: 10px;
+    }
+    .cod-badge {
+      background-color: #ffc107;
+      color: #000;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-weight: bold;
+    }
+    .order-summary {
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      padding: 20px;
+    }
+    
+    /* Mock Payment Modal Styles */
+    .payment-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+    }
+    .payment-modal.show {
+      display: flex;
+    }
+    .payment-modal-content {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    }
+    .upi-app {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 15px;
+      margin: 10px 0;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    .upi-app:hover {
+      background-color: #f0f0f0;
+      border-color: #ff6600;
+    }
+    .upi-app img {
+      width: 40px;
+      height: 40px;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="index.html" style="font-weight: bold; font-size: 1.8rem; color: #ff6600;">
+        Sports Shop
+      </a>
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="user-dashboard.html">Continue Shopping</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container mt-5 mb-5">
+    <h2 class="mb-4">Checkout</h2>
+    
+    <div class="row">
+      <!-- Left Column - Shipping & Payment -->
+      <div class="col-md-7">
+        <!-- Shipping Information -->
+        <div class="card mb-4">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Shipping Information</h5>
+          </div>
+          <div class="card-body">
+            <form id="shipping-form">
+              <div class="mb-3">
+                <label for="userName" class="form-label">Full Name</label>
+                <input type="text" class="form-control" id="userName" required>
+              </div>
+              <div class="mb-3">
+                <label for="userPhone" class="form-label">Phone Number</label>
+                <input type="tel" class="form-control" id="userPhone" required pattern="[0-9]{10}">
+              </div>
+              <div class="mb-3">
+                <label for="shippingAddress" class="form-label">Shipping Address</label>
+                <textarea class="form-control" id="shippingAddress" rows="3" required></textarea>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Payment Method -->
+        <div class="card">
+          <div class="card-header bg-success text-white">
+            <h5 class="mb-0">Payment Method</h5>
+          </div>
+          <div class="card-body">
+            <!-- UPI Payment -->
+            <div class="payment-method" id="upi-method" onclick="selectPayment('UPI')">
+              <input type="radio" name="payment" id="upi-radio" value="UPI">
+              <label for="upi-radio" style="cursor: pointer; width: 100%;">
+                <div class="d-flex align-items-center justify-content-between">
+                  <div>
+                    <h6 class="mb-1">UPI Payment</h6>
+                    <small class="text-muted">PhonePe, Google Pay, Paytm & more</small>
+                  </div>
+                  <div>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/UPI-Logo-vector.svg/120px-UPI-Logo-vector.svg.png" alt="UPI" height="30">
+                  </div>
+                </div>
+              </label>
+            </div>
+
+            <!-- COD Payment -->
+            <div class="payment-method" id="cod-method" onclick="selectPayment('COD')">
+              <input type="radio" name="payment" id="cod-radio" value="COD">
+              <label for="cod-radio" style="cursor: pointer; width: 100%;">
+                <div class="d-flex align-items-center justify-content-between">
+                  <div>
+                    <h6 class="mb-1">Cash on Delivery (COD)</h6>
+                    <small class="text-muted">Pay when you receive</small>
+                  </div>
+                  <div>
+                    <span class="cod-badge">+ ₹40 charges</span>
+                  </div>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column - Order Summary -->
+      <div class="col-md-5">
+        <div class="order-summary">
+          <h5 class="mb-3">Order Summary</h5>
+          <div id="cart-items-summary"></div>
+          <hr>
+          <div class="d-flex justify-content-between mb-2">
+            <span>Subtotal:</span>
+            <span id="subtotal">₹0</span>
+          </div>
+          <div class="d-flex justify-content-between mb-2" id="cod-charges-row" style="display: none !important;">
+            <span>COD Charges:</span>
+            <span id="cod-charges">₹0</span>
+          </div>
+          <hr>
+          <div class="d-flex justify-content-between mb-3">
+            <strong>Total:</strong>
+            <strong id="total-amount">₹0</strong>
+          </div>
+          <button class="btn btn-success w-100" id="place-order-btn" onclick="placeOrder()">
+            Place Order
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mock UPI Payment Modal -->
+  <div class="payment-modal" id="upi-modal">
+    <div class="payment-modal-content">
+      <h4 class="mb-4 text-center">Choose UPI App</h4>
+      
+      <div class="upi-app" onclick="completeUpiPayment('PhonePe')">
+        <img src="https://cdn.iconscout.com/icon/free/png-256/free-phonepe-logo-icon-download-in-svg-png-gif-file-formats--payment-banking-app-brand-pack-logos-icons-1583122.png" alt="PhonePe">
+        <div>
+          <strong>PhonePe</strong>
+          <div class="text-muted small">Pay with PhonePe</div>
+        </div>
+      </div>
+
+      <div class="upi-app" onclick="completeUpiPayment('Google Pay')">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Google_Pay_Logo.svg/512px-Google_Pay_Logo.svg.png" alt="Google Pay">
+        <div>
+          <strong>Google Pay</strong>
+          <div class="text-muted small">Pay with Google Pay</div>
+        </div>
+      </div>
+
+      <div class="upi-app" onclick="completeUpiPayment('Paytm')">
+        <img src="https://companieslogo.com/img/orig/PAYTM.NS-a1898296.png" alt="Paytm">
+        <div>
+          <strong>Paytm</strong>
+          <div class="text-muted small">Pay with Paytm</div>
+        </div>
+      </div>
+
+      <button class="btn btn-secondary w-100 mt-3" onclick="closeUpiModal()">Cancel</button>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    let selectedPaymentMethod = '';
+    let cartItems = [];
+    let subtotalAmount = 0;
+    let codCharges = 40;
+    let currentOrderData = null;
+
+    document.addEventListener('DOMContentLoaded', async function() {
+      const userEmail = localStorage.getItem('userEmail');
+      const userName = localStorage.getItem('userName');
+      
+      if (!userEmail) {
+        alert('Please sign in to checkout');
+        window.location.href = 'sign-in.html';
+        return;
+      }
+
+      document.getElementById('userName').value = userName || '';
+      
+      await loadCartItems(userEmail);
+      await loadCodCharges();
+    });
+
+    async function loadCartItems(email) {
+      try {
+        const res = await fetch(`/cart/${encodeURIComponent(email)}`);
+        if (res.ok) {
+          cartItems = await res.json();
+          renderCartSummary();
+        }
+      } catch (e) {
+        console.error('Error loading cart:', e);
+      }
+    }
+
+    async function loadCodCharges() {
+      try {
+        const res = await fetch('/api/orders/cod-charges');
+        if (res.ok) {
+          const data = await res.json();
+          codCharges = data.codCharges;
+        }
+      } catch (e) {
+        console.error('Error loading COD charges:', e);
+      }
+    }
+
+    function renderCartSummary() {
+      const container = document.getElementById('cart-items-summary');
+      container.innerHTML = '';
+      subtotalAmount = 0;
+
+      cartItems.forEach(item => {
+        const itemTotal = item.price * item.quantity;
+        subtotalAmount += itemTotal;
+        
+        container.innerHTML += `
+          <div class="d-flex justify-content-between mb-2">
+            <span>${item.itemName} x ${item.quantity}</span>
+            <span>₹${itemTotal}</span>
+          </div>
+        `;
+      });
+
+      updateTotalAmount();
+    }
+
+    function selectPayment(method) {
+      selectedPaymentMethod = method;
+      
+      document.querySelectorAll('.payment-method').forEach(el => el.classList.remove('selected'));
+      document.getElementById(method.toLowerCase() + '-method').classList.add('selected');
+      document.getElementById(method.toLowerCase() + '-radio').checked = true;
+      
+      updateTotalAmount();
+    }
+
+    function updateTotalAmount() {
+      document.getElementById('subtotal').textContent = '₹' + subtotalAmount;
+      
+      const codChargesRow = document.getElementById('cod-charges-row');
+      const codChargesSpan = document.getElementById('cod-charges');
+      
+      let totalAmount = subtotalAmount;
+      
+      if (selectedPaymentMethod === 'COD') {
+        totalAmount += codCharges;
+        codChargesRow.style.display = 'flex';
+        codChargesSpan.textContent = '₹' + codCharges;
+      } else {
+        codChargesRow.style.display = 'none';
+      }
+      
+      document.getElementById('total-amount').textContent = '₹' + totalAmount;
+    }
+
+    async function placeOrder() {
+      if (!selectedPaymentMethod) {
+        alert('Please select a payment method');
+        return;
+      }
+
+      const userName = document.getElementById('userName').value.trim();
+      const userPhone = document.getElementById('userPhone').value.trim();
+      const shippingAddress = document.getElementById('shippingAddress').value.trim();
+
+      if (!userName || !userPhone || !shippingAddress) {
+        alert('Please fill all shipping information');
+        return;
+      }
+
+      const userEmail = localStorage.getItem('userEmail');
+      
+      currentOrderData = {
+        userEmail: userEmail,
+        userName: userName,
+        userPhone: userPhone,
+        shippingAddress: shippingAddress,
+        totalAmount: subtotalAmount,
+        orderItems: JSON.stringify(cartItems)
+      };
+
+      if (selectedPaymentMethod === 'COD') {
+        await placeCodOrder(currentOrderData);
+      } else if (selectedPaymentMethod === 'UPI') {
+        await placeUpiOrder(currentOrderData);
+      }
+    }
+
+    async function placeCodOrder(orderData) {
+      try {
+        const res = await fetch('/api/orders/create-cod', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(orderData)
+        });
+
+        if (res.ok) {
+          const order = await res.json();
+          alert('Order placed successfully! Order ID: ' + order.id);
+          await clearCart();
+          window.location.href = 'order-placed.html?orderId=' + order.id;
+        } else {
+          alert('Error placing order');
+        }
+      } catch (e) {
+        alert('Error: ' + e.message);
+      }
+    }
+
+    async function placeUpiOrder(orderData) {
+      try {
+        const res = await fetch('/api/orders/create-upi', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(orderData)
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          currentOrderData.mockPaymentId = data.mockPaymentId;
+          currentOrderData.mockOrderId = data.mockOrderId;
+          currentOrderData.orderId = data.orderId;
+          
+          document.getElementById('upi-modal').classList.add('show');
+        } else {
+          alert('Error creating payment order');
+        }
+      } catch (e) {
+        alert('Error: ' + e.message);
+      }
+    }
+
+    function closeUpiModal() {
+      document.getElementById('upi-modal').classList.remove('show');
+    }
+
+    async function completeUpiPayment(appName) {
+      closeUpiModal();
+      alert(`Opening ${appName}... (Simulated)\n\nClick OK to complete payment`);
+      
+      await verifyPayment({
+        mockOrderId: currentOrderData.mockOrderId,
+        mockPaymentId: currentOrderData.mockPaymentId
+      });
+    }
+
+    async function verifyPayment(response) {
+      try {
+        const res = await fetch('/api/orders/verify-payment', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(response)
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success) {
+            await clearCart();
+            window.location.href = 'order-placed.html?orderId=' + data.orderId;
+          }
+        }
+      } catch (e) {
+        alert('Payment verification failed');
+      }
+    }
+
+    async function clearCart() {
+      const userEmail = localStorage.getItem('userEmail');
+      try {
+        await fetch(`/cart/clear?userEmail=${encodeURIComponent(userEmail)}`, {
+          method: 'DELETE'
+        });
+      } catch (e) {
+        console.error('Error clearing cart:', e);
+      }
+    }
+  </script>
+</body>
+</html>

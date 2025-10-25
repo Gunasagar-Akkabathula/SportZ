@@ -11,6 +11,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/cart")
+@CrossOrigin(origins = "*")
 public class CartController {
 
     private final CartService cartService;
@@ -28,18 +29,36 @@ public class CartController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Login required");
         }
 
-        String itemName = (String) payload.get("itemName");
-        int quantity = (int) payload.getOrDefault("quantity", 1);
+        try {
+            String itemName = (String) payload.get("itemName");
+            int quantity = (int) payload.getOrDefault("quantity", 1);
 
-        cartService.addOrUpdateCartItem(userEmail, itemName, quantity);
+            // Get product details including price and image
+            Product product = productService.getProductByName(itemName);
+            if (product == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found");
+            }
 
-        List<Cart> userCarts = cartService.getCartByUserEmail(userEmail);
-        int cartCount = userCarts.stream().mapToInt(Cart::getQuantity).sum();
+            // Add to cart with price and image
+            cartService.addOrUpdateCartItem(
+                userEmail, 
+                itemName, 
+                quantity, 
+                product.getPrice(), 
+                product.getImageUrl()
+            );
 
-        Map<String, Integer> response = new HashMap<>();
-        response.put("cartCount", cartCount);
+            List<Cart> userCarts = cartService.getCartByUserEmail(userEmail);
+            int cartCount = userCarts.stream().mapToInt(Cart::getQuantity).sum();
 
-        return ResponseEntity.ok(response);
+            Map<String, Integer> response = new HashMap<>();
+            response.put("cartCount", cartCount);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Error adding to cart: " + e.getMessage());
+        }
     }
 
     @GetMapping("/{userEmail}")
@@ -48,41 +67,60 @@ public class CartController {
         List<Map<String, Object>> response = new ArrayList<>();
 
         for (Cart cartItem : carts) {
-            Product product = productService.getProductByName(cartItem.getItemName());
-            if (product != null) {
-                Map<String, Object> map = new HashMap<>();
-                map.put("id", cartItem.getId());
-                map.put("item_name", cartItem.getItemName());
-                map.put("quantity", cartItem.getQuantity());
-                map.put("price", product.getPrice());
-                map.put("image_url", product.getImageUrl());
-                response.add(map);
-            }
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", cartItem.getId());
+            map.put("itemName", cartItem.getItemName());
+            map.put("quantity", cartItem.getQuantity());
+            map.put("price", cartItem.getPrice());
+            map.put("imageUrl", cartItem.getImageUrl());
+            response.add(map);
         }
         return ResponseEntity.ok(response);
     }
 
     @PutMapping("/update")
     public ResponseEntity<?> updateCartQuantity(@RequestBody Map<String, Object> payload) {
-        Long id = ((Number) payload.get("id")).longValue();
-        int quantity = (int) payload.get("quantity");
-        Optional<Cart> cartOpt = cartService.findById(id);
-        if (cartOpt.isPresent()) {
-            Cart cartItem = cartOpt.get();
-            cartItem.setQuantity(quantity);
-            cartService.saveCart(cartItem);
-            return ResponseEntity.ok("Updated");
+        try {
+            Long id = ((Number) payload.get("id")).longValue();
+            int quantity = (int) payload.get("quantity");
+            
+            Optional<Cart> cartOpt = cartService.findById(id);
+            if (cartOpt.isPresent()) {
+                Cart cartItem = cartOpt.get();
+                cartItem.setQuantity(quantity);
+                cartService.saveCart(cartItem);
+                return ResponseEntity.ok("Updated");
+            }
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cart item not found");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Error updating cart");
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cart item not found");
     }
 
     @DeleteMapping("/remove/{id}")
     public ResponseEntity<?> removeCartItem(@PathVariable Long id) {
-        Optional<Cart> cartOpt = cartService.findById(id);
-        if (cartOpt.isPresent()) {
-            cartService.deleteCart(id);
-            return ResponseEntity.ok("Removed");
+        try {
+            Optional<Cart> cartOpt = cartService.findById(id);
+            if (cartOpt.isPresent()) {
+                cartService.deleteCart(id);
+                return ResponseEntity.ok("Removed");
+            }
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cart item not found");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Error removing item");
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cart item not found");
+    }
+    
+    @DeleteMapping("/clear")
+    public ResponseEntity<?> clearCart(@RequestParam String userEmail) {
+        try {
+            cartService.clearCart(userEmail);
+            return ResponseEntity.ok("Cart cleared");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Error clearing cart");
+        }
     }
 }

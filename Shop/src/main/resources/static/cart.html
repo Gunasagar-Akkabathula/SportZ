@@ -4,7 +4,9 @@
   <meta charset="UTF-8" />
   <title>Your Cart - Shop</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
   <style>
+    .navbar-brand { font-weight: bold; font-size: 1.8rem; color: #ff6600 !important; }
     .cart-item img { width: 80px; height: 80px; object-fit: contain; border-radius: 7px; }
     .cart-item { border-bottom: 1px solid #e0e0e0; padding: 18px 0; }
     .cart-item:last-child { border-bottom: none; }
@@ -15,19 +17,48 @@
 <body>
   <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm mb-4">
     <div class="container-fluid">
+      <a class="navbar-brand" href="index.html">Sports Shop</a>
       <ul class="navbar-nav ms-auto">
-        <li class="nav-item"><a class="nav-link" href="user-dashboard.html">Profile</a></li>
-       
+        <li class="nav-item"><a class="nav-link" href="user-dashboard.html">Products</a></li>
+        <li class="nav-item"><a class="nav-link" href="my-orders.html">My Orders</a></li>
       </ul>
     </div>
   </nav>
 
   <div class="container">
-    <h2>Your Cart</h2>
+    <h2 class="mb-4"><i class="bi bi-cart3 me-2"></i>Your Cart</h2>
     <div id="cart-items"></div>
-    <div class="cart-total mt-4">Total: ₹<span id="cart-total">0.00</span></div>
+    
+    <!-- Cart Summary Section -->
+    <div class="row mt-4" id="cart-summary" style="display: none;">
+      <div class="col-md-8"></div>
+      <div class="col-md-4">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h5 class="mb-3">Cart Summary</h5>
+            <hr>
+            <div class="d-flex justify-content-between mb-3">
+              <span class="fw-bold">Subtotal:</span>
+              <span class="cart-total text-success">₹<span id="cart-total">0.00</span></span>
+            </div>
+            <hr>
+            <a href="checkout.html" class="btn btn-success w-100 btn-lg" id="checkout-btn">
+              <i class="bi bi-credit-card me-2"></i>Proceed to Checkout
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty Cart Message -->
+    <div id="empty-cart-message" style="display: none;" class="text-center py-5">
+      <i class="bi bi-cart-x" style="font-size: 80px; color: #ccc;"></i>
+      <h4 class="mt-3 text-muted">Your cart is empty!</h4>
+      <a href="user-dashboard.html" class="btn btn-warning mt-3">Start Shopping</a>
+    </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     function getUserEmail() {
       return localStorage.getItem("userEmail");
@@ -41,8 +72,10 @@
     async function loadCart() {
       const email = getUserEmail();
       if (!email) {
-        document.getElementById('cart-items').innerHTML = "<b>Please sign in to see your cart.</b>";
+        document.getElementById('cart-items').innerHTML = "<div class='alert alert-warning'><b>Please sign in to see your cart.</b></div>";
         updateCartBadge(0);
+        document.getElementById('cart-summary').style.display = 'none';
+        document.getElementById('empty-cart-message').style.display = 'block';
         return;
       }
 
@@ -52,28 +85,39 @@
       let total = 0;
       let totalCount = 0;
 
+      if (items.length === 0) {
+        document.getElementById('cart-items').innerHTML = '';
+        document.getElementById('cart-summary').style.display = 'none';
+        document.getElementById('empty-cart-message').style.display = 'block';
+        updateCartBadge(0);
+        return;
+      }
+
       items.forEach(item => {
         total += item.quantity * (item.price || 0);
         totalCount += item.quantity;
         html += `
           <div class="row align-items-center cart-item">
-            <div class="col-xs-12 col-md-2">
-              <img src="${item.image_url || 'https://via.placeholder.com/80'}" alt="${item.item_name}" />
+            <div class="col-md-2 col-4">
+              <img src="${item.imageUrl || 'https://via.placeholder.com/80'}" alt="${item.itemName}" />
             </div>
-            <div class="col-xs-12 col-md-3 fw-bold">${item.item_name} <span>x${item.quantity}</span></div>
-            <div class="col-xs-6 col-md-2">₹${item.price || 'N/A'}</div>
-            <div class="col-xs-3 col-md-2">
-              <input type="number" min="1" value="${item.quantity}" style="width:50px;" onchange="updateCart(${item.id}, this.value)" />
+            <div class="col-md-3 col-8 fw-bold">${item.itemName} <span class="text-muted">x${item.quantity}</span></div>
+            <div class="col-md-2 col-6 text-muted">₹${item.price || 'N/A'}</div>
+            <div class="col-md-2 col-6">
+              <input type="number" min="1" value="${item.quantity}" class="form-control" style="width:70px;" onchange="updateCart(${item.id}, this.value)" />
             </div>
-            <div class="col-xs-3 col-md-2 fw-bold">₹${(item.quantity * (item.price||0)).toFixed(2)}</div>
-            <div class="col-xs-12 col-md-1 cart-actions">
-              <button class="btn btn-sm btn-danger" onclick="removeCartItem(${item.id})">Remove</button>
+            <div class="col-md-2 col-6 fw-bold text-success">₹${(item.quantity * (item.price||0)).toFixed(2)}</div>
+            <div class="col-md-1 col-6 cart-actions">
+              <button class="btn btn-sm btn-danger" onclick="removeCartItem(${item.id})"><i class="bi bi-trash"></i> Remove</button>
             </div>
           </div>
         `;
       });
-      document.getElementById('cart-items').innerHTML = html || "<p>Your cart is empty!</p>";
+      
+      document.getElementById('cart-items').innerHTML = html;
       document.getElementById('cart-total').textContent = total.toFixed(2);
+      document.getElementById('cart-summary').style.display = 'block';
+      document.getElementById('empty-cart-message').style.display = 'none';
       updateCartBadge(totalCount);
     }
 
