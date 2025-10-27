@@ -220,7 +220,7 @@
               <div class="col-md-6 col-12">
                 <h5>${product.name}</h5>
                 <div>${product.description || ''}</div>
-                <div class="text-danger fw-bold mt-1">$${product.price}</div>
+                <div class="text-danger fw-bold mt-1">₹${product.price}</div>
               </div>
               <div class="col-md-3 col-12 product-actions">
                 <button class="btn btn-outline-success btn-sm" onclick="showEditModal(${product.id}, '${escapeQuotes(product.name)}', '${escapeQuotes(product.description)}', '${product.price}', '${escapeQuotes(product.imageUrl)}')">Edit</button>
