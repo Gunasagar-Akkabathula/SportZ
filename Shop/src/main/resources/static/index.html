@@ -18,9 +18,9 @@
       align-items: center;
     }
     .navbar-brand img {
-      height: 32px;
+      height: 80px;
       margin-right: 8px;
-      border-radius: 6px;
+      border-radius: 50%;
     }
     .navbar-nav {
       gap: 18px;
@@ -65,21 +65,67 @@
       text-align: center;
       margin-top: 30px;
     }
+
+    @media (max-width: 991px) {
+  .navbar form#search-form {
+    margin: 10px 0;
+    max-width: 100%;
+  }
+  .navbar .navbar-nav {
+    gap: 8px;
+    width: 100%;
+    justify-content: flex-start !important;
+  }
+  .navbar .search-input {
+    min-width: 0;
+  }
+}
+@media (max-width: 576px) {
+  .navbar-brand {
+    font-size: 1.2rem;
+  }
+  .navbar .nav-link {
+    font-size: 1rem;
+  }
+}
+
   </style>
 </head>
 <body>
   <!-- Navigation Bar -->
-  <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
-    <div class="container-fluid">
-      <a class="navbar-brand d-flex align-items-center" href="index.html">
-        <img src="https://via.placeholder.com/32x32.png?text=S" >
-        Sports Shop
-      </a>
-      <form class="d-flex mx-auto w-50" role="search" id="search-form">
+ <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+  <div class="container-fluid">
+    <!-- Brand/Logo -->
+    <a class="navbar-brand d-flex align-items-center" href="index.html">
+      <img src="SportZ.png" style="height:60px; width:auto; border-radius:50%; margin-right:8px;">
+      <span class="ms-2" style="font-size:1.5rem; font-weight:700;">SportZ</span>
+    </a>
+
+    <!-- About & Contact after Brand -->
+    <ul class="navbar-nav flex-row ms-2 d-none d-lg-flex">
+      <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+      <li class="nav-item"><a class="nav-link" href="contact.html">Contact Us</a></li>
+    </ul>
+
+    <!-- Hamburger Toggle Button for Mobile -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Collapsible Navbar Content -->
+    <div class="collapse navbar-collapse" id="mainNavbar">
+      <!-- Show About/Contact on mobile inside collapse -->
+      <ul class="navbar-nav d-lg-none">
+        <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+        <li class="nav-item"><a class="nav-link" href="contact.html">Contact Us</a></li>
+      </ul>
+      <!-- Centered Search Bar (Mobile: full width, Desktop: centered) -->
+      <form class="d-flex mx-lg-auto my-2 my-lg-0 flex-grow-1" role="search" id="search-form" style="max-width:530px;min-width:160px;">
         <input class="form-control me-2 search-input" type="search" placeholder="Search for products, brands and more" aria-label="Search" id="search-input" />
         <button class="btn btn-warning" type="submit">Search</button>
       </form>
-      <ul class="navbar-nav ms-auto align-items-center" id="dynamic-navbar-links">
+      <!-- Menu Items (right) -->
+      <ul class="navbar-nav ms-lg-auto align-items-center mt-2 mt-lg-0">
         <li class="nav-item"><a class="nav-link" href="categories.html">Categories</a></li>
         <li class="nav-item">
           <a class="nav-link d-flex align-items-center position-relative" href="cart.html">
@@ -91,7 +137,9 @@
         <li class="nav-item"><a class="nav-link" href="sign-up.html">Sign Up</a></li>
       </ul>
     </div>
-  </nav>
+  </div>
+</nav>
+
 
   <!-- Banner and Intro -->
   <div class="container mt-4">
@@ -114,7 +162,7 @@
   <!-- Footer -->
   <footer>
     <div class="container">
-      &copy; 2025 Shop. All rights reserved.
+      &copy; 2025 SportZ Online Store. All rights reserved.
     </div>
   </footer>
 

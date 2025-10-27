@@ -7,6 +7,11 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
   <style>
     .navbar-brand { font-weight: bold; font-size: 1.8rem; color: #ff6600 !important; }
+    .navbar-brand img {
+      height: 80px;
+      margin-right: 8px;
+      border-radius: 50%;
+    }
     .cart-item img { width: 80px; height: 80px; object-fit: contain; border-radius: 7px; }
     .cart-item { border-bottom: 1px solid #e0e0e0; padding: 18px 0; }
     .cart-item:last-child { border-bottom: none; }
@@ -17,7 +22,10 @@
 <body>
   <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm mb-4">
     <div class="container-fluid">
-      <a class="navbar-brand" href="index.html">Sports Shop</a>
+      <a class="navbar-brand d-flex align-items-center" href="index.html">
+      <img src="SportZ.png" >
+      <span class="ms-2">SportZ</span>
+    </a>
       <ul class="navbar-nav ms-auto">
         <li class="nav-item"><a class="nav-link" href="user-dashboard.html">Products</a></li>
         <li class="nav-item"><a class="nav-link" href="my-orders.html">My Orders</a></li>

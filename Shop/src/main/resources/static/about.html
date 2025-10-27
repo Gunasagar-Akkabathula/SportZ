@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>About Us - Sports Shop</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <style>
+    .navbar-brand { font-weight: bold; font-size: 1.8rem; color: #ff6600 !important; }
+    .navbar-brand img {
+      height: 80px;
+      margin-right: 8px;
+      border-radius: 50%;
+    }
+    .about-logo {
+      height: 52px;
+      width: auto;
+      border-radius: 10px;
+      margin-bottom: 12px;
+    }
+    .about-section {
+      background: #fff;
+      border-radius: 16px;
+      padding: 40px 18px;
+      margin-top: 32px;
+      box-shadow: 0 4px 30px rgba(0,0,0,0.13);
+    }
+    @media (max-width: 576px) {
+      .about-section {
+        padding: 18px 5px;
+        margin-top: 16px;
+      }
+      .about-logo { height: 38px; }
+    }
+  </style>
+</head>
+<body style="background: #f9fafb;">
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+    <div class="container-fluid">
+      <a class="navbar-brand d-flex align-items-center" href="#">
+      <img src="SportZ.png" >
+      <span class="ms-2">SportZ</span>
+    </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="mainNavbar">
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link active" href="about.html">About</a></li>
+          <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- About Section -->
+  <div class="container about-section text-center">
+    <h2>About SportZ Online Store</h2>
+    <p class="lead mt-3 mb-4">
+      SportZ was founded with the mission to bring top-quality sports equipment and accessories to athletes,players of all levels.<br>
+      Our curated collections, expert support, and unbeatable prices empower you to unleash your power on and off the field.
+    </p>
+    <div class="row mt-4">
+      <div class="col-md-4 mb-3">
+        <h5 class="mb-2 text-success">Wide Selection</h5>
+        <p>From cricket bats to basketballs and everything in between, find gear for every sport and every player.</p>
+      </div>
+      <div class="col-md-4 mb-3">
+        <h5 class="mb-2 text-danger">100% Genuine Products</h5>
+        <p>We source only from trusted brands and suppliers to guarantee authenticity and quality for all our customers.</p>
+      </div>
+      <div class="col-md-4 mb-3">
+        <h5 class="mb-2 text-warning">Fast Delivery</h5>
+        <p>Orders are processed quickly and delivered at lightning speed to get you back in the game as soon as possible.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="mt-4 pb-2 pt-3 bg-dark text-light text-center">
+    &copy; 2025 SportZ Online Store. All rights reserved.
+  </footer>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
