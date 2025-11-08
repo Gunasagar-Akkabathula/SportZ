@@ -1,11 +1,6 @@
 # 🏀 SportZ – E-Commerce Online Sports Store
 
-**Live App:** [https://sportz-292ffa45b5b3.herokuapp.com/](https://sportz-292ffa45b5b3.herokuapp.com/)
-
-🌍 Live Deployment
-
-You can access the live version of the app here:
-👉 SportZ Live App
+🌍**Live Deployment App:** [https://sportz-292ffa45b5b3.herokuapp.com/](https://sportz-292ffa45b5b3.herokuapp.com/)
 
 SportZ is a modern, full-featured **E-Commerce web application** built for selling sports gear and apparel online.  
 It provides a seamless shopping experience with secure authentication, dynamic product listings, and an intuitive user interface.
@@ -31,7 +26,7 @@ It provides a seamless shopping experience with secure authentication, dynamic p
 - Bootstrap for UI design
 
 **Backend:**
-- Node.js / Express.js
+- Spring boot Java
 - MySQL(railway) and MySQL(local)
 - RESTful APIs for data handling
 
